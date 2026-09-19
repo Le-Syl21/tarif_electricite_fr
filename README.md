@@ -29,7 +29,7 @@ Le prix actuel change à la minute près : à l'heure creuse que vous avez indiq
 1. HACS → *Dépôts personnalisés* → `https://github.com/Le-Syl21/tarif_electricite_fr`, catégorie *Intégration*.
 2. Installez *Tarif électricité FR*, redémarrez Home Assistant.
 3. *Paramètres* → *Appareils et services* → *Ajouter une intégration* → *Tarif électricité FR*.
-4. Choisissez l'option, puis la puissance (en kVA, sur votre facture). Pour Heures Creuses, indiquez vos heures creuses, par exemple `22:00-06:00` ou `01:30-07:30, 12:30-14:30`. Elles se modifient ensuite dans *Configurer*.
+4. Choisissez l'option, puis la puissance (en kVA, sur votre facture). Pour Heures Creuses, recopiez vos heures creuses telles qu'écrites sur la facture : `22:00-06:00`, `1h/7h30 & 13h/14h30` ou `HC (22H30-6H30)` sont acceptés. Elles se modifient ensuite dans *Configurer*.
 
 ### D'où viennent les prix
 
@@ -90,7 +90,7 @@ The price changes on the minute: at your off-peak hours, and at 06:00 / 22:00 fo
 1. HACS → *Custom repositories* → `https://github.com/Le-Syl21/tarif_electricite_fr`, category *Integration*.
 2. Install *Tarif électricité FR*, restart Home Assistant.
 3. *Settings* → *Devices & services* → *Add integration* → *Tarif électricité FR*.
-4. Pick the option, then the power (in kVA, on your bill). For Heures Creuses, enter your off-peak hours, for example `22:00-06:00` or `01:30-07:30, 12:30-14:30`. They can be changed later under *Configure*.
+4. Pick the option, then the power (in kVA, on your bill). For Heures Creuses, copy your off-peak hours as written on your bill: `22:00-06:00`, `1h/7h30 & 13h/14h30` or `HC (22H30-6H30)` are accepted. They can be changed later under *Configure*.
 
 ### Where the prices come from
 

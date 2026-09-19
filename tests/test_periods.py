@@ -21,6 +21,18 @@ def test_parse_offpeak_forms():
     ]
 
 
+def test_parse_offpeak_bill_forms():
+    # SICAE ELY bill, "Tranche HC".
+    assert parse_offpeak("1h/7h30 & 13h/14h30") == [
+        (time(1), time(7, 30)),
+        (time(13), time(14, 30)),
+    ]
+    assert parse_offpeak("22h à 6h et 12h30 à 14h30") == [
+        (time(22), time(6)),
+        (time(12, 30), time(14, 30)),
+    ]
+
+
 def test_parse_offpeak_enedis_form():
     assert parse_offpeak("HC (22H30-6H30)") == [(time(22, 30), time(6, 30))]
     assert parse_offpeak("HC (2H00-7H00;13H00-16H00)") == [
@@ -29,7 +41,7 @@ def test_parse_offpeak_enedis_form():
     ]
 
 
-@pytest.mark.parametrize("text", ["", "22-6", "25:00-06:00", "10:00-10:00", "22:00"])
+@pytest.mark.parametrize("text", ["", "25:00-06:00", "10:00-10:00", "22:00", "22h30", "1h/", "HC"])
 def test_parse_offpeak_rejects(text):
     with pytest.raises(ValueError):
         parse_offpeak(text)

@@ -16,7 +16,7 @@
           "offpeak_hours": "Heures creuses"
         },
         "data_description": {
-          "offpeak_hours": "Les heures creuses indiquées sur votre facture ou votre espace client, par exemple 22:00-06:00, 01:30-07:30, 12:30-14:30, ou tel qu'Enedis les écrit : HC (22H30-6H30)."
+          "offpeak_hours": "Les heures creuses telles qu'écrites sur votre facture ou votre espace client, par exemple 22:00-06:00, 1h/7h30 & 13h/14h30, ou HC (22H30-6H30)."
         }
       }
     },
@@ -35,7 +35,7 @@
           "offpeak_hours": "Heures creuses"
         },
         "data_description": {
-          "offpeak_hours": "Les heures creuses indiquées sur votre facture ou votre espace client, par exemple 22:00-06:00, 01:30-07:30, 12:30-14:30, ou tel qu'Enedis les écrit : HC (22H30-6H30)."
+          "offpeak_hours": "Les heures creuses telles qu'écrites sur votre facture ou votre espace client, par exemple 22:00-06:00, 1h/7h30 & 13h/14h30, ou HC (22H30-6H30)."
         }
       }
     },

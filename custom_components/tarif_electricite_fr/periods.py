@@ -12,14 +12,21 @@ from .const import (
     TEMPO_OFFPEAK_START_HOUR,
 )
 
-_RANGE = re.compile(r"^\s*(\d{1,2})[:h](\d{2})\s*-\s*(\d{1,2})[:h](\d{2})\s*$")
+_RANGE = re.compile(
+    r"^\s*(\d{1,2})[:h](\d{2})\s*-\s*(\d{1,2})[:h](\d{2})\s*$", re.IGNORECASE
+)
+# Enedis writes them "HC (22H30-6H30)" or "HC (2H00-7H00;13H00-16H00)".
+_ENEDIS = re.compile(r"^\s*HC\s*\((.*)\)\s*$", re.IGNORECASE)
 
 
 def parse_offpeak(text: str) -> list[tuple[time, time]]:
     """Parse off-peak hours such as "22:00-06:00" or "01:30-07:30, 12:30-14:30".
 
-    Ranges may cross midnight. Raises ValueError on anything else.
+    Enedis' own form, "HC (22H30-6H30)", is accepted as is. Ranges may cross
+    midnight. Raises ValueError on anything else.
     """
+    if found := _ENEDIS.match(text):
+        text = found.group(1)
     ranges = []
     for part in text.replace(";", ",").split(","):
         if not part.strip():

@@ -21,6 +21,14 @@ def test_parse_offpeak_forms():
     ]
 
 
+def test_parse_offpeak_enedis_form():
+    assert parse_offpeak("HC (22H30-6H30)") == [(time(22, 30), time(6, 30))]
+    assert parse_offpeak("HC (2H00-7H00;13H00-16H00)") == [
+        (time(2), time(7)),
+        (time(13), time(16)),
+    ]
+
+
 @pytest.mark.parametrize("text", ["", "22-6", "25:00-06:00", "10:00-10:00", "22:00"])
 def test_parse_offpeak_rejects(text):
     with pytest.raises(ValueError):

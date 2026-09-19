@@ -1,0 +1,141 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "EDF Tarif Bleu",
+        "description": "Choose the pricing option of your contract.",
+        "data": {
+          "option": "Option"
+        }
+      },
+      "power": {
+        "title": "Subscribed power",
+        "description": "The power in kVA written on your bill.",
+        "data": {
+          "power": "Subscribed power",
+          "offpeak_hours": "Off-peak hours"
+        },
+        "data_description": {
+          "offpeak_hours": "Off-peak hours written on your bill or in your customer area, for example 22:00-06:00 or 01:30-07:30, 12:30-14:30."
+        }
+      }
+    },
+    "error": {
+      "invalid_offpeak": "Write the hours as 22:00-06:00, several ranges separated by commas."
+    },
+    "abort": {
+      "already_configured": "This option and power are already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Off-peak hours",
+        "data": {
+          "offpeak_hours": "Off-peak hours"
+        },
+        "data_description": {
+          "offpeak_hours": "Off-peak hours written on your bill or in your customer area, for example 22:00-06:00 or 01:30-07:30, 12:30-14:30."
+        }
+      }
+    },
+    "error": {
+      "invalid_offpeak": "Write the hours as 22:00-06:00, several ranges separated by commas."
+    },
+    "abort": {
+      "nothing_to_configure": "Only the Heures Creuses option has settings (its off-peak hours)."
+    }
+  },
+  "selector": {
+    "option": {
+      "options": {
+        "base": "Base: one price all day",
+        "hphc": "Heures Creuses: cheaper off-peak hours",
+        "tempo": "Tempo: blue, white and red days"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "price_now": {
+        "name": "Price now"
+      },
+      "period_now": {
+        "name": "Period now",
+        "state": {
+          "base": "Base",
+          "hp": "Peak hours",
+          "hc": "Off-peak hours",
+          "bleu_hc": "Blue day, off-peak",
+          "bleu_hp": "Blue day, peak",
+          "blanc_hc": "White day, off-peak",
+          "blanc_hp": "White day, peak",
+          "rouge_hc": "Red day, off-peak",
+          "rouge_hp": "Red day, peak"
+        }
+      },
+      "subscription": {
+        "name": "Monthly subscription"
+      },
+      "valid_from": {
+        "name": "Prices in force since"
+      },
+      "source": {
+        "name": "Price source",
+        "state": {
+          "cre": "CRE (open data)",
+          "edf": "EDF price grid"
+        }
+      },
+      "colour_today": {
+        "name": "Tempo colour today",
+        "state": {
+          "bleu": "Blue",
+          "blanc": "White",
+          "rouge": "Red"
+        }
+      },
+      "colour_tomorrow": {
+        "name": "Tempo colour tomorrow",
+        "state": {
+          "bleu": "Blue",
+          "blanc": "White",
+          "rouge": "Red"
+        }
+      },
+      "price_hp": {
+        "name": "Price peak hours"
+      },
+      "price_hc": {
+        "name": "Price off-peak hours"
+      },
+      "price_bleu_hc": {
+        "name": "Price blue day, off-peak"
+      },
+      "price_bleu_hp": {
+        "name": "Price blue day, peak"
+      },
+      "price_blanc_hc": {
+        "name": "Price white day, off-peak"
+      },
+      "price_blanc_hp": {
+        "name": "Price white day, peak"
+      },
+      "price_rouge_hc": {
+        "name": "Price red day, off-peak"
+      },
+      "price_rouge_hp": {
+        "name": "Price red day, peak"
+      },
+      "remaining_bleu": {
+        "name": "Blue days left"
+      },
+      "remaining_blanc": {
+        "name": "White days left"
+      },
+      "remaining_rouge": {
+        "name": "Red days left"
+      }
+    }
+  }
+}

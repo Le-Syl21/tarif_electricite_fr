@@ -1,0 +1,141 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "EDF Tarif Bleu",
+        "description": "Choisissez l'option tarifaire de votre contrat.",
+        "data": {
+          "option": "Option"
+        }
+      },
+      "power": {
+        "title": "Puissance souscrite",
+        "description": "La puissance en kVA indiquée sur votre facture.",
+        "data": {
+          "power": "Puissance souscrite",
+          "offpeak_hours": "Heures creuses"
+        },
+        "data_description": {
+          "offpeak_hours": "Les heures creuses indiquées sur votre facture ou votre espace client, par exemple 22:00-06:00 ou 01:30-07:30, 12:30-14:30."
+        }
+      }
+    },
+    "error": {
+      "invalid_offpeak": "Écrivez les heures sous la forme 22:00-06:00, plusieurs plages séparées par des virgules."
+    },
+    "abort": {
+      "already_configured": "Cette option et cette puissance sont déjà configurées."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Heures creuses",
+        "data": {
+          "offpeak_hours": "Heures creuses"
+        },
+        "data_description": {
+          "offpeak_hours": "Les heures creuses indiquées sur votre facture ou votre espace client, par exemple 22:00-06:00 ou 01:30-07:30, 12:30-14:30."
+        }
+      }
+    },
+    "error": {
+      "invalid_offpeak": "Écrivez les heures sous la forme 22:00-06:00, plusieurs plages séparées par des virgules."
+    },
+    "abort": {
+      "nothing_to_configure": "Seule l'option Heures Creuses a des réglages (ses heures creuses)."
+    }
+  },
+  "selector": {
+    "option": {
+      "options": {
+        "base": "Base : un seul prix toute la journée",
+        "hphc": "Heures Creuses : prix réduit en heures creuses",
+        "tempo": "Tempo : jours bleus, blancs et rouges"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "price_now": {
+        "name": "Prix actuel"
+      },
+      "period_now": {
+        "name": "Période actuelle",
+        "state": {
+          "base": "Base",
+          "hp": "Heures pleines",
+          "hc": "Heures creuses",
+          "bleu_hc": "Jour bleu, heures creuses",
+          "bleu_hp": "Jour bleu, heures pleines",
+          "blanc_hc": "Jour blanc, heures creuses",
+          "blanc_hp": "Jour blanc, heures pleines",
+          "rouge_hc": "Jour rouge, heures creuses",
+          "rouge_hp": "Jour rouge, heures pleines"
+        }
+      },
+      "subscription": {
+        "name": "Abonnement mensuel"
+      },
+      "valid_from": {
+        "name": "Prix en vigueur depuis"
+      },
+      "source": {
+        "name": "Source des prix",
+        "state": {
+          "cre": "CRE (données ouvertes)",
+          "edf": "Grille tarifaire EDF"
+        }
+      },
+      "colour_today": {
+        "name": "Couleur Tempo du jour",
+        "state": {
+          "bleu": "Bleu",
+          "blanc": "Blanc",
+          "rouge": "Rouge"
+        }
+      },
+      "colour_tomorrow": {
+        "name": "Couleur Tempo de demain",
+        "state": {
+          "bleu": "Bleu",
+          "blanc": "Blanc",
+          "rouge": "Rouge"
+        }
+      },
+      "price_hp": {
+        "name": "Prix heures pleines"
+      },
+      "price_hc": {
+        "name": "Prix heures creuses"
+      },
+      "price_bleu_hc": {
+        "name": "Prix jour bleu, heures creuses"
+      },
+      "price_bleu_hp": {
+        "name": "Prix jour bleu, heures pleines"
+      },
+      "price_blanc_hc": {
+        "name": "Prix jour blanc, heures creuses"
+      },
+      "price_blanc_hp": {
+        "name": "Prix jour blanc, heures pleines"
+      },
+      "price_rouge_hc": {
+        "name": "Prix jour rouge, heures creuses"
+      },
+      "price_rouge_hp": {
+        "name": "Prix jour rouge, heures pleines"
+      },
+      "remaining_bleu": {
+        "name": "Jours bleus restants"
+      },
+      "remaining_blanc": {
+        "name": "Jours blancs restants"
+      },
+      "remaining_rouge": {
+        "name": "Jours rouges restants"
+      }
+    }
+  }
+}

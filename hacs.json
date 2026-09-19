@@ -1,0 +1,6 @@
+{
+  "name": "Tarif électricité FR",
+  "content_in_root": false,
+  "homeassistant": "2025.3.0",
+  "country": ["FR"]
+}

@@ -56,6 +56,16 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "offpeak": {
+        "name": "Off-peak hours",
+        "state_attributes": {
+          "next_change": {
+            "name": "Next change"
+          }
+        }
+      }
+    },
     "sensor": {
       "price_now": {
         "name": "Price now"

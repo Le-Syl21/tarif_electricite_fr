@@ -14,14 +14,14 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import CURRENCY_EURO, EntityCategory, UnitOfEnergy
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import tempo
-from .const import DOMAIN, OPTION_TEMPO, PERIODS, TEMPO_COLOURS
+from .const import OPTION_TEMPO, PERIODS, TEMPO_COLOURS
 from .coordinator import TarifConfigEntry, TarifCoordinator
+from .entity import device_info
 from .periods import tempo_day
 
 PRICE_UNIT = f"{CURRENCY_EURO}/{UnitOfEnergy.KILO_WATT_HOUR}"
@@ -163,13 +163,7 @@ class TarifSensor(CoordinatorEntity[TarifCoordinator], SensorEntity):
         self.entity_description = description
         entry = coordinator.config_entry
         self._attr_unique_id = f"{entry.unique_id}_{description.key}"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name=entry.title,
-            manufacturer="EDF",
-            model=f"Tarif Bleu {coordinator.option} {coordinator.power} kVA",
-            entry_type=DeviceEntryType.SERVICE,
-        )
+        self._attr_device_info = device_info(coordinator)
 
     @property
     def native_value(self):

@@ -56,6 +56,16 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "offpeak": {
+        "name": "Heures creuses",
+        "state_attributes": {
+          "next_change": {
+            "name": "Next change"
+          }
+        }
+      }
+    },
     "sensor": {
       "price_now": {
         "name": "Prix actuel"

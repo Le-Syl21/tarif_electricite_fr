@@ -15,6 +15,7 @@ Pour une option et une puissance souscrite, l'intégration crée :
 | Capteur | Exemple |
 |---|---|
 | Prix actuel (€/kWh TTC), à brancher dans le tableau de bord Énergie | 0,1589 |
+| Heures creuses (capteur binaire : allumé pendant les heures creuses), avec l'heure de la prochaine bascule | Allumé, jusqu'à 06:00 |
 | Période actuelle | Heures creuses |
 | Prix de chaque période (HP/HC, ou les 6 prix Tempo) | Jour rouge, heures pleines : 0,7295 |
 | Abonnement mensuel TTC | 15,86 € |
@@ -23,6 +24,42 @@ Pour une option et une puissance souscrite, l'intégration crée :
 | Prix en vigueur depuis, source des prix (diagnostic) | 01/08/2026, CRE |
 
 Le prix actuel change à la minute près : à l'heure creuse que vous avez indiquée, et à 6 h / 22 h pour Tempo. Une journée Tempo va de 6 h à 6 h le lendemain : à 3 h du matin, c'est encore la couleur de la veille qui s'applique, et l'intégration en tient compte.
+
+La couleur de demain est publiée par RTE la veille vers 11 h ; avant, le capteur « Couleur Tempo de demain » est inconnu. RTE ne publie rien plus à l'avance.
+
+Exemple : la veille d'un jour rouge, chauffer à fond pendant les heures creuses, jusqu'à 6 h.
+
+```yaml
+automation:
+  - alias: Préchauffer avant un jour rouge
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.tarif_bleu_tempo_9_kva_heures_creuses
+        to: "on"
+    conditions:
+      - condition: state
+        entity_id: sensor.tarif_bleu_tempo_9_kva_couleur_tempo_de_demain
+        state: rouge
+    actions:
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.salon
+        data:
+          temperature: 23
+  - alias: Fin du préchauffage
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.tarif_bleu_tempo_9_kva_heures_creuses
+        to: "off"
+    actions:
+      - action: climate.set_temperature
+        target:
+          entity_id: climate.salon
+        data:
+          temperature: 19
+```
+
+Les noms d'entités dépendent de votre option et de votre puissance : retrouvez les vôtres dans *Paramètres* → *Appareils et services* → *Tarif électricité FR*.
 
 ### Installation
 
@@ -76,6 +113,7 @@ For one pricing option and one subscribed power, the integration creates:
 | Sensor | Example |
 |---|---|
 | Price now (€/kWh incl. taxes), for the Energy dashboard | 0.1589 |
+| Off-peak hours (binary sensor: on during off-peak), with the time of the next switch | On, until 06:00 |
 | Period now | Off-peak hours |
 | Price of each period (peak/off-peak, or the 6 Tempo prices) | Red day, peak: 0.7295 |
 | Monthly subscription incl. taxes | €15.86 |
@@ -84,6 +122,10 @@ For one pricing option and one subscribed power, the integration creates:
 | Prices in force since, price source (diagnostic) | 2026-08-01, CRE |
 
 The price changes on the minute: at your off-peak hours, and at 06:00 / 22:00 for Tempo. A Tempo day runs from 06:00 to 06:00 the next day: at 03:00 the previous day's colour still applies, and the integration accounts for it.
+
+RTE publishes tomorrow's colour the day before around 11:00; until then the "Tempo colour tomorrow" sensor is unknown. RTE publishes nothing further ahead.
+
+Example: the day before a red day, heat at full power during off-peak hours, until 06:00: trigger on the *Off-peak hours* binary sensor turning on, with the condition *Tempo colour tomorrow* = `rouge`; set the temperature back when it turns off. The French section above has the full YAML.
 
 ### Installation
 

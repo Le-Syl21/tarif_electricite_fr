@@ -1,12 +1,15 @@
 """Off-peak hours, Tempo days and the period in force."""
 
 from datetime import date, datetime, time
+from zoneinfo import ZoneInfo
 
 import pytest
 
 from custom_components.tarif_electricite_fr.periods import (
     current_period,
     in_ranges,
+    next_change,
+    offpeak_ranges,
     parse_offpeak,
     tempo_day,
 )
@@ -96,3 +99,38 @@ def test_remaining_counts_today():
     colours = {date(2026, 9, d): "bleu" for d in range(1, 21)}  # 20 is tomorrow
     colours[date(2026, 8, 31)] = "rouge"  # previous season
     assert remaining(colours, date(2026, 9, 19)) == {"bleu": 281, "blanc": 43, "rouge": 22}
+
+
+PARIS = ZoneInfo("Europe/Paris")
+
+
+def test_next_change_bill_ranges():
+    ranges = parse_offpeak("1h/7h30 & 13h/14h30")
+    at = lambda h, m: next_change(datetime(2026, 9, 19, h, m, tzinfo=PARIS), ranges)
+    assert at(0, 30) == datetime(2026, 9, 19, 1, 0, tzinfo=PARIS)
+    assert at(3, 0) == datetime(2026, 9, 19, 7, 30, tzinfo=PARIS)
+    assert at(14, 30) == datetime(2026, 9, 20, 1, 0, tzinfo=PARIS)
+
+
+def test_next_change_touching_ranges_are_one():
+    ranges = parse_offpeak("22:00-00:00, 00:00-06:00")
+    assert next_change(datetime(2026, 9, 19, 23, 0, tzinfo=PARIS), ranges) == datetime(
+        2026, 9, 20, 6, 0, tzinfo=PARIS
+    )
+
+
+def test_next_change_tempo_and_base():
+    tempo = offpeak_ranges("tempo", [])
+    assert next_change(datetime(2026, 12, 1, 23, 0, tzinfo=PARIS), tempo) == datetime(
+        2026, 12, 2, 6, 0, tzinfo=PARIS
+    )
+    assert (
+        next_change(datetime(2026, 12, 1, 23, 0, tzinfo=PARIS), offpeak_ranges("base", [])) is None
+    )
+
+
+def test_next_change_across_dst():
+    # 25 October 2026: clocks go back at 03:00; off-peak still ends at 06:00 local.
+    end = next_change(datetime(2026, 10, 24, 23, 0, tzinfo=PARIS), offpeak_ranges("tempo", []))
+    assert end == datetime(2026, 10, 25, 6, 0, tzinfo=PARIS)
+    assert end.utcoffset().total_seconds() == 3600

@@ -150,3 +150,38 @@ async def test_all_sources_down_keeps_last_prices(
     await hass.async_block_till_done()
     assert hass.states.get("sensor.test_price_now").state == "0.2001"
     assert hass.states.get("sensor.test_prices_in_force_since").attributes["cre_reachable"] is False
+
+
+async def test_red_tomorrow_heat_until_offpeak_ends(
+    hass: HomeAssistant, network, freezer: FrozenDateTimeFactory
+) -> None:
+    # 22:30 on a Tempo day: off-peak is on, ends at 06:00, and tomorrow's
+    # colour (white in the mock) is already known.
+    freezer.move_to(datetime(2026, 12, 1, 22, 30, tzinfo=PARIS))
+    await _setup(hass, {"option": "tempo", "power": 9})
+    offpeak = hass.states.get("binary_sensor.test_off_peak_hours")
+    assert offpeak.state == "on"
+    assert offpeak.attributes["next_change"] == "2026-12-02T06:00:00+01:00"
+    assert hass.states.get("sensor.test_tempo_colour_tomorrow").state == "blanc"
+
+
+async def test_offpeak_binary_hphc_and_none_for_base(
+    hass: HomeAssistant, network, freezer: FrozenDateTimeFactory
+) -> None:
+    freezer.move_to(datetime(2026, 9, 19, 14, 0, tzinfo=PARIS))
+    await _setup(hass, {"option": "hphc", "power": 6}, {"offpeak_hours": "1h/7h30 & 13h/14h30"})
+    offpeak = hass.states.get("binary_sensor.test_off_peak_hours")
+    assert offpeak.state == "on"
+    assert offpeak.attributes["next_change"] == "2026-09-19T14:30:00+02:00"
+
+    freezer.tick(31 * 60)
+    from pytest_homeassistant_custom_component.common import async_fire_time_changed
+
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert hass.states.get("binary_sensor.test_off_peak_hours").state == "off"
+
+
+async def test_no_offpeak_binary_for_base(hass: HomeAssistant, network) -> None:
+    await _setup(hass, {"option": "base", "power": 6})
+    assert hass.states.get("binary_sensor.test_off_peak_hours") is None

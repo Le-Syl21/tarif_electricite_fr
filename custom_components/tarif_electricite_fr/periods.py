@@ -57,6 +57,37 @@ def in_ranges(moment: time, ranges: list[tuple[time, time]]) -> bool:
     return False
 
 
+TEMPO_OFFPEAK = [(time(TEMPO_OFFPEAK_START_HOUR), time(TEMPO_DAY_START_HOUR))]
+
+
+def offpeak_ranges(option: str, offpeak: list[tuple[time, time]]) -> list[tuple[time, time]]:
+    """Off-peak ranges of an option: the customer's for HP/HC, fixed for Tempo."""
+    if option == OPTION_BASE:
+        return []
+    if option == OPTION_HPHC:
+        return offpeak
+    return TEMPO_OFFPEAK
+
+
+def next_change(now: datetime, ranges: list[tuple[time, time]]) -> datetime | None:
+    """When off-peak next starts or ends after ``now``; None without ranges.
+
+    Two ranges that touch (22:00-00:00 and 00:00-06:00) make one: only a real
+    switch counts. Times are wall-clock times in ``now``'s time zone.
+    """
+    if not ranges:
+        return None
+    current = in_ranges(now.time(), ranges)
+    bounds = sorted({t for pair in ranges for t in pair})
+    for days in range(3):
+        day = now.date() + timedelta(days=days)
+        for bound in bounds:
+            moment = datetime.combine(day, bound, tzinfo=now.tzinfo)
+            if moment > now and in_ranges(bound, ranges) != current:
+                return moment
+    return None
+
+
 def tempo_day(now: datetime) -> date:
     """The Tempo day ``now`` belongs to: a Tempo day starts at 06:00."""
     if now.hour < TEMPO_DAY_START_HOUR:
@@ -82,5 +113,4 @@ def current_period(
     colour = colours.get(tempo_day(now))
     if colour is None:
         return None
-    offpeak_tempo = now.hour >= TEMPO_OFFPEAK_START_HOUR or now.hour < TEMPO_DAY_START_HOUR
-    return f"{colour}_{'hc' if offpeak_tempo else 'hp'}"
+    return f"{colour}_{'hc' if in_ranges(now.time(), TEMPO_OFFPEAK) else 'hp'}"

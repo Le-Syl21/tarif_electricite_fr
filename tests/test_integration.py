@@ -99,9 +99,9 @@ async def test_base_18_kva_comes_from_edf(
 ) -> None:
     freezer.move_to(datetime(2026, 9, 19, 12, tzinfo=PARIS))
     await _setup(hass, {"option": "base", "power": 18})
-    assert hass.states.get("sensor.test_price_now").state == "0.1985"
-    assert hass.states.get("sensor.test_price_source").state == "edf"
-    assert hass.states.get("sensor.test_monthly_subscription").state == "31.14"
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.1985"
+    assert hass.states.get("sensor.source_des_prix").state == "edf"
+    assert hass.states.get("sensor.abonnement_mensuel").state == "31.14"
 
 
 async def test_hphc_switches_on_the_minute(
@@ -109,18 +109,18 @@ async def test_hphc_switches_on_the_minute(
 ) -> None:
     freezer.move_to(datetime(2026, 9, 19, 21, 59, 30, tzinfo=PARIS))
     await _setup(hass, {"option": "hphc", "power": 6}, {"offpeak_hours": "22:00-06:00"})
-    assert hass.states.get("sensor.test_period_now").state == "hp"
-    assert hass.states.get("sensor.test_price_now").state == "0.2142"
-    assert hass.states.get("sensor.test_price_source").state == "cre"
-    assert hass.states.get("sensor.test_monthly_subscription").state == "15.86"  # EDF's
+    assert hass.states.get("sensor.periode_actuelle").state == "hp"
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.2142"
+    assert hass.states.get("sensor.source_des_prix").state == "cre"
+    assert hass.states.get("sensor.abonnement_mensuel").state == "15.86"  # EDF's
 
     freezer.tick(40)
     from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
-    assert hass.states.get("sensor.test_period_now").state == "hc"
-    assert hass.states.get("sensor.test_price_now").state == "0.1589"
+    assert hass.states.get("sensor.periode_actuelle").state == "hc"
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.1589"
 
 
 async def test_tempo_red_night(
@@ -129,11 +129,11 @@ async def test_tempo_red_night(
     freezer.move_to(datetime(2026, 12, 2, 3, 0, tzinfo=PARIS))
     await _setup(hass, {"option": "tempo", "power": 9})
     # 03:00 on 2 December still belongs to the red Tempo day of 1 December.
-    assert hass.states.get("sensor.test_tempo_colour_today").state == "rouge"
-    assert hass.states.get("sensor.test_tempo_colour_tomorrow").state == "blanc"
-    assert hass.states.get("sensor.test_period_now").state == "rouge_hc"
-    assert hass.states.get("sensor.test_price_now").state == "0.1615"
-    assert hass.states.get("sensor.test_price_red_day_peak").state == "0.7295"
+    assert hass.states.get("sensor.couleur_du_jour").state == "rouge"
+    assert hass.states.get("sensor.couleur_de_demain").state == "blanc"
+    assert hass.states.get("sensor.periode_actuelle").state == "rouge_hc"
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.1615"
+    assert hass.states.get("sensor.prix_kwh_rouge_hp").state == "0.7295"
 
 
 async def test_all_sources_down_keeps_last_prices(
@@ -141,15 +141,15 @@ async def test_all_sources_down_keeps_last_prices(
 ) -> None:
     freezer.move_to(datetime(2026, 9, 19, 12, tzinfo=PARIS))
     entry = await _setup(hass, {"option": "base", "power": 6})
-    assert hass.states.get("sensor.test_price_now").state == "0.2001"
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.2001"
 
     network.clear_requests()
     for url in (*CRE_URLS.values(), EDF_GRID_URL):
         network.get(url, status=503)
     await hass.config_entries.async_reload(entry.entry_id)
     await hass.async_block_till_done()
-    assert hass.states.get("sensor.test_price_now").state == "0.2001"
-    assert hass.states.get("sensor.test_prices_in_force_since").attributes["cre_reachable"] is False
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.2001"
+    assert hass.states.get("sensor.prix_en_vigueur_depuis").attributes["cre_reachable"] is False
 
 
 async def test_red_tomorrow_heat_until_offpeak_ends(
@@ -159,10 +159,10 @@ async def test_red_tomorrow_heat_until_offpeak_ends(
     # colour (white in the mock) is already known.
     freezer.move_to(datetime(2026, 12, 1, 22, 30, tzinfo=PARIS))
     await _setup(hass, {"option": "tempo", "power": 9})
-    offpeak = hass.states.get("binary_sensor.test_off_peak_hours")
+    offpeak = hass.states.get("binary_sensor.heures_creuses")
     assert offpeak.state == "on"
     assert offpeak.attributes["next_change"] == "2026-12-02T06:00:00+01:00"
-    assert hass.states.get("sensor.test_tempo_colour_tomorrow").state == "blanc"
+    assert hass.states.get("sensor.couleur_de_demain").state == "blanc"
 
 
 async def test_offpeak_binary_hphc_and_none_for_base(
@@ -170,7 +170,7 @@ async def test_offpeak_binary_hphc_and_none_for_base(
 ) -> None:
     freezer.move_to(datetime(2026, 9, 19, 14, 0, tzinfo=PARIS))
     await _setup(hass, {"option": "hphc", "power": 6}, {"offpeak_hours": "1h/7h30 & 13h/14h30"})
-    offpeak = hass.states.get("binary_sensor.test_off_peak_hours")
+    offpeak = hass.states.get("binary_sensor.heures_creuses")
     assert offpeak.state == "on"
     assert offpeak.attributes["next_change"] == "2026-09-19T14:30:00+02:00"
 
@@ -179,9 +179,77 @@ async def test_offpeak_binary_hphc_and_none_for_base(
 
     async_fire_time_changed(hass)
     await hass.async_block_till_done()
-    assert hass.states.get("binary_sensor.test_off_peak_hours").state == "off"
+    assert hass.states.get("binary_sensor.heures_creuses").state == "off"
 
 
-async def test_no_offpeak_binary_for_base(hass: HomeAssistant, network) -> None:
+async def test_offpeak_binary_always_off_for_base(
+    hass: HomeAssistant, network, freezer: FrozenDateTimeFactory
+) -> None:
+    # Base has no off-peak hours, but the sensor exists so the same automation
+    # works whatever the contract.
+    freezer.move_to(datetime(2026, 9, 19, 2, 0, tzinfo=PARIS))
     await _setup(hass, {"option": "base", "power": 6})
-    assert hass.states.get("binary_sensor.test_off_peak_hours") is None
+    offpeak = hass.states.get("binary_sensor.heures_creuses")
+    assert offpeak.state == "off"
+    assert offpeak.attributes["next_change"] is None
+
+
+async def test_old_entity_ids_are_renamed(
+    hass: HomeAssistant, network, freezer: FrozenDateTimeFactory
+) -> None:
+    """An install made before 1.0 keeps its entities, under the new ids."""
+    from homeassistant.helpers import entity_registry as er
+
+    freezer.move_to(datetime(2026, 12, 1, 12, tzinfo=PARIS))  # red day in the mock
+    await hass.config.async_set_time_zone("Europe/Paris")
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={"option": "tempo", "power": 9}, unique_id="tempo_9", title="test"
+    )
+    entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    old = registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        "tempo_9_price_now",
+        suggested_object_id="tarif_bleu_tempo_9_kva_prix_actuel",
+        config_entry=entry,
+    )
+    assert old.entity_id == "sensor.tarif_bleu_tempo_9_kva_prix_actuel"
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert registry.async_get_entity_id("sensor", DOMAIN, "tempo_9_price_now") == (
+        "sensor.prix_kwh_actuel"
+    )
+    assert hass.states.get("sensor.prix_kwh_actuel").state == "0.7295"  # red day, peak
+
+
+async def test_taken_entity_id_is_left_alone(
+    hass: HomeAssistant, network, freezer: FrozenDateTimeFactory
+) -> None:
+    """A name already used by something else is not stolen."""
+    from homeassistant.helpers import entity_registry as er
+
+    freezer.move_to(datetime(2026, 9, 19, 12, tzinfo=PARIS))
+    await hass.config.async_set_time_zone("Europe/Paris")
+    registry = er.async_get(hass)
+    registry.async_get_or_create(
+        "sensor", "template", "someone_else", suggested_object_id="prix_kwh_actuel"
+    )
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={"option": "tempo", "power": 9}, unique_id="tempo_9", title="test"
+    )
+    entry.add_to_hass(hass)
+    registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        "tempo_9_price_now",
+        suggested_object_id="tarif_bleu_tempo_9_kva_prix_actuel",
+        config_entry=entry,
+    )
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    assert registry.async_get_entity_id("sensor", DOMAIN, "tempo_9_price_now") == (
+        "sensor.tarif_bleu_tempo_9_kva_prix_actuel"
+    )

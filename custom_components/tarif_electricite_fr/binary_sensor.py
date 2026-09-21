@@ -10,7 +10,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import OPTION_BASE
+from .const import OBJECT_IDS
 from .coordinator import TarifConfigEntry, TarifCoordinator
 from .entity import device_info
 from .periods import in_ranges, next_change, offpeak_ranges
@@ -21,9 +21,9 @@ async def async_setup_entry(
     entry: TarifConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    coordinator = entry.runtime_data
-    if coordinator.option != OPTION_BASE:
-        async_add_entities([OffpeakBinarySensor(coordinator)])
+    # Created for every option, including Base where it stays off: a dashboard
+    # or an automation written for one contract then works on the others.
+    async_add_entities([OffpeakBinarySensor(entry.runtime_data)])
 
 
 class OffpeakBinarySensor(CoordinatorEntity[TarifCoordinator], BinarySensorEntity):
@@ -40,6 +40,7 @@ class OffpeakBinarySensor(CoordinatorEntity[TarifCoordinator], BinarySensorEntit
         super().__init__(coordinator)
         entry = coordinator.config_entry
         self._attr_unique_id = f"{entry.unique_id}_offpeak"
+        self.entity_id = f"binary_sensor.{OBJECT_IDS['offpeak']}"
         self._attr_device_info = device_info(coordinator)
 
     @property

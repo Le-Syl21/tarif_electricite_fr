@@ -12,16 +12,19 @@ Une intégration Home Assistant pour les tarifs réglementés de l'électricité
 
 Pour une option et une puissance souscrite, l'intégration crée :
 
-| Capteur | Exemple |
-|---|---|
-| Prix actuel (€/kWh TTC), à brancher dans le tableau de bord Énergie | 0,1589 |
-| Heures creuses (capteur binaire : allumé pendant les heures creuses), avec l'heure de la prochaine bascule | Allumé, jusqu'à 06:00 |
-| Période actuelle | Heures creuses |
-| Prix de chaque période (HP/HC, ou les 6 prix Tempo) | Jour rouge, heures pleines : 0,7295 |
-| Abonnement mensuel TTC | 15,86 € |
-| Couleur Tempo du jour et de demain | Bleu / Blanc / Rouge |
-| Jours bleus, blancs, rouges restants dans la saison | 281 / 43 / 22 |
-| Prix en vigueur depuis, source des prix (diagnostic) | 01/08/2026, CRE |
+| Entité | Quoi | Exemple |
+|---|---|---|
+| `sensor.prix_kwh_actuel` | Prix du kWh TTC, à brancher dans le tableau de bord Énergie | 0,1589 |
+| `binary_sensor.heures_creuses` | Allumé pendant les heures creuses ; attribut `next_change` = prochaine bascule | Allumé, jusqu'à 06:00 |
+| `sensor.periode_actuelle` | Période en cours | `rouge_hp` |
+| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Prix de chaque période, option Heures Creuses | 0,2142 · 0,1589 |
+| `sensor.prix_kwh_bleu_hc` … `sensor.prix_kwh_rouge_hp` | Les six prix Tempo | 0,7295 |
+| `sensor.abonnement_mensuel` | Abonnement mensuel TTC | 15,86 € |
+| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Couleur Tempo | Bleu / Blanc / Rouge |
+| `sensor.jours_bleus_restants` · `blancs` · `rouges` | Jours restants dans la saison | 281 / 43 / 22 |
+| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | Diagnostic | 01/08/2026, CRE |
+
+Les identifiants sont **les mêmes chez tout le monde**, quelle que soit la langue de Home Assistant : les exemples ci-dessous marchent tels quels. Les libellés affichés, eux, sont traduits. Le capteur binaire existe aussi en option Base, où il reste éteint, pour qu'une automatisation écrite pour un contrat fonctionne avec les autres.
 
 Le prix actuel change à la minute près : à l'heure creuse que vous avez indiquée, et à 6 h / 22 h pour Tempo. Une journée Tempo va de 6 h à 6 h le lendemain : à 3 h du matin, c'est encore la couleur de la veille qui s'applique, et l'intégration en tient compte.
 
@@ -34,11 +37,11 @@ automation:
   - alias: Préchauffer avant un jour rouge
     triggers:
       - trigger: state
-        entity_id: binary_sensor.tarif_bleu_tempo_9_kva_heures_creuses
+        entity_id: binary_sensor.heures_creuses
         to: "on"
     conditions:
       - condition: state
-        entity_id: sensor.tarif_bleu_tempo_9_kva_couleur_tempo_de_demain
+        entity_id: sensor.couleur_de_demain
         state: rouge
     actions:
       - action: climate.set_temperature
@@ -49,7 +52,7 @@ automation:
   - alias: Fin du préchauffage
     triggers:
       - trigger: state
-        entity_id: binary_sensor.tarif_bleu_tempo_9_kva_heures_creuses
+        entity_id: binary_sensor.heures_creuses
         to: "off"
     actions:
       - action: climate.set_temperature
@@ -59,7 +62,7 @@ automation:
           temperature: 19
 ```
 
-Les noms d'entités dépendent de votre option et de votre puissance : retrouvez les vôtres dans *Paramètres* → *Appareils et services* → *Tarif électricité FR*.
+Mise à jour depuis la 0.2 : les entités sont renommées automatiquement au premier démarrage. Pensez à corriger vos automatisations, qui référencent les anciens noms.
 
 ### Installation
 
@@ -110,16 +113,19 @@ Les **offres de marché** des fournisseurs alternatifs (prix libres) ne sont pas
 
 For one pricing option and one subscribed power, the integration creates:
 
-| Sensor | Example |
-|---|---|
-| Price now (€/kWh incl. taxes), for the Energy dashboard | 0.1589 |
-| Off-peak hours (binary sensor: on during off-peak), with the time of the next switch | On, until 06:00 |
-| Period now | Off-peak hours |
-| Price of each period (peak/off-peak, or the 6 Tempo prices) | Red day, peak: 0.7295 |
-| Monthly subscription incl. taxes | €15.86 |
-| Tempo colour today and tomorrow | Blue / White / Red |
-| Blue, white, red days left in the season | 281 / 43 / 22 |
-| Prices in force since, price source (diagnostic) | 2026-08-01, CRE |
+| Entity | What | Example |
+|---|---|---|
+| `sensor.prix_kwh_actuel` | Price of the kWh incl. taxes, for the Energy dashboard | 0.1589 |
+| `binary_sensor.heures_creuses` | On during off-peak hours; `next_change` attribute holds the next switch | On, until 06:00 |
+| `sensor.periode_actuelle` | Period in force | `rouge_hp` |
+| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Price of each period, Heures Creuses option | 0.2142 · 0.1589 |
+| `sensor.prix_kwh_bleu_hc` … `sensor.prix_kwh_rouge_hp` | The six Tempo prices | 0.7295 |
+| `sensor.abonnement_mensuel` | Monthly subscription incl. taxes | €15.86 |
+| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo colour | Blue / White / Red |
+| `sensor.jours_bleus_restants` · `blancs` · `rouges` | Days left in the season | 281 / 43 / 22 |
+| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | Diagnostic | 2026-08-01, CRE |
+
+Entity ids are **the same on every install**, whatever the language of Home Assistant, so the examples below work as they are; the labels shown in the interface are translated. The binary sensor is created for the Base option too, where it stays off, so an automation written for one contract works with the others.
 
 The price changes on the minute: at your off-peak hours, and at 06:00 / 22:00 for Tempo. A Tempo day runs from 06:00 to 06:00 the next day: at 03:00 the previous day's colour still applies, and the integration accounts for it.
 

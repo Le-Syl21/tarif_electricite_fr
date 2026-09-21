@@ -59,3 +59,25 @@ EDF_GRID_REFRESH: Final = timedelta(hours=12)
 USER_AGENT: Final = "Mozilla/5.0 (X11; Linux x86_64) Home Assistant tarif_electricite_fr"
 
 STORAGE_VERSION: Final = 1
+
+# Entity ids are fixed, and in French, whatever the language of Home Assistant:
+# this integration only ever serves the French regulated tariff, so an example
+# copied from the documentation or a forum works as it is on every install.
+# Labels stay translated. One meter per home, so no contract in the id.
+OBJECT_IDS: Final = {
+    "price_now": "prix_kwh_actuel",
+    "period_now": "periode_actuelle",
+    "subscription": "abonnement_mensuel",
+    "valid_from": "prix_en_vigueur_depuis",
+    "source": "source_des_prix",
+    "offpeak": "heures_creuses",
+    "colour_today": "couleur_du_jour",
+    "colour_tomorrow": "couleur_de_demain",
+    **{f"price_{p}": f"prix_kwh_{p}" for p in ("base", "hp", "hc")},
+    **{
+        f"price_{colour}_{slot}": f"prix_kwh_{colour}_{slot}"
+        for colour in TEMPO_COLOURS
+        for slot in ("hc", "hp")
+    },
+    **{f"remaining_{c}": f"jours_{c}s_restants" for c in TEMPO_COLOURS},
+}

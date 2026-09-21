@@ -68,10 +68,10 @@
     },
     "sensor": {
       "price_now": {
-        "name": "Price now"
+        "name": "Current kWh price"
       },
       "period_now": {
-        "name": "Period now",
+        "name": "Current period",
         "state": {
           "base": "Base",
           "hp": "Peak hours",
@@ -114,28 +114,28 @@
         }
       },
       "price_hp": {
-        "name": "Price peak hours"
+        "name": "kWh price, peak hours"
       },
       "price_hc": {
-        "name": "Price off-peak hours"
+        "name": "kWh price, off-peak hours"
       },
       "price_bleu_hc": {
-        "name": "Price blue day, off-peak"
+        "name": "kWh price, blue day off-peak"
       },
       "price_bleu_hp": {
-        "name": "Price blue day, peak"
+        "name": "kWh price, blue day peak"
       },
       "price_blanc_hc": {
-        "name": "Price white day, off-peak"
+        "name": "kWh price, white day off-peak"
       },
       "price_blanc_hp": {
-        "name": "Price white day, peak"
+        "name": "kWh price, white day peak"
       },
       "price_rouge_hc": {
-        "name": "Price red day, off-peak"
+        "name": "kWh price, red day off-peak"
       },
       "price_rouge_hp": {
-        "name": "Price red day, peak"
+        "name": "kWh price, red day peak"
       },
       "remaining_bleu": {
         "name": "Blue days left"

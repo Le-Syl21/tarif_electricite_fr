@@ -19,7 +19,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import tempo
-from .const import OPTION_TEMPO, PERIODS, TEMPO_COLOURS
+from .const import OBJECT_IDS, OPTION_TEMPO, PERIODS, TEMPO_COLOURS
 from .coordinator import TarifConfigEntry, TarifCoordinator
 from .entity import device_info
 from .periods import tempo_day
@@ -163,6 +163,8 @@ class TarifSensor(CoordinatorEntity[TarifCoordinator], SensorEntity):
         self.entity_description = description
         entry = coordinator.config_entry
         self._attr_unique_id = f"{entry.unique_id}_{description.key}"
+        # Suggest the entity id, so it is the same on every install.
+        self.entity_id = f"sensor.{OBJECT_IDS[description.key]}"
         self._attr_device_info = device_info(coordinator)
 
     @property

@@ -12,17 +12,19 @@ Une intégration Home Assistant pour les tarifs réglementés de l'électricité
 
 Pour une option et une puissance souscrite, l'intégration crée :
 
-| Entité | Quoi | Exemple |
-|---|---|---|
-| `sensor.prix_kwh_actuel` | Prix du kWh TTC, à brancher dans le tableau de bord Énergie | 0,1589 |
-| `binary_sensor.heures_creuses` | Allumé pendant les heures creuses ; attribut `next_change` = prochaine bascule | Allumé, jusqu'à 06:00 |
-| `sensor.periode_actuelle` | Période en cours | `rouge_hp` |
-| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Prix de chaque période, option Heures Creuses | 0,2142 · 0,1589 |
-| `sensor.prix_kwh_bleu_hc` … `sensor.prix_kwh_rouge_hp` | Les six prix Tempo | 0,7295 |
-| `sensor.abonnement_mensuel` | Abonnement mensuel TTC | 15,86 € |
-| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Couleur Tempo | Bleu / Blanc / Rouge |
-| `sensor.jours_bleus_restants` · `blancs` · `rouges` | Jours restants dans la saison | 281 / 43 / 22 |
-| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | Diagnostic | 01/08/2026, CRE |
+| Entité | Option | Quoi | Exemple |
+|---|---|---|---|
+| `sensor.prix_kwh_actuel` | toutes | Prix du kWh TTC, à brancher dans le tableau de bord Énergie | 0,1589 |
+| `binary_sensor.heures_creuses` | toutes | Allumé pendant les heures creuses ; attribut `next_change` = prochaine bascule | Allumé, jusqu'à 06:00 |
+| `sensor.periode_actuelle` | toutes | Période en cours | `rouge_hp` |
+| `sensor.abonnement_mensuel` | toutes | Abonnement mensuel TTC | 15,86 € |
+| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | toutes | Diagnostic | 01/08/2026, CRE |
+| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Heures Creuses | Prix de chaque période | 0,2142 · 0,1589 |
+| `sensor.prix_kwh_bleu_hc` · `sensor.prix_kwh_bleu_hp` · `sensor.prix_kwh_blanc_hc` · `sensor.prix_kwh_blanc_hp` · `sensor.prix_kwh_rouge_hc` · `sensor.prix_kwh_rouge_hp` | Tempo | Les six prix Tempo | 0,7295 |
+| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo | Couleur Tempo | Bleu / Blanc / Rouge |
+| `sensor.jours_bleus_restants` · `sensor.jours_blancs_restants` · `sensor.jours_rouges_restants` | Tempo | Jours restants dans la saison | 281 / 43 / 22 |
+
+En option Base il n'y a qu'un prix : c'est `sensor.prix_kwh_actuel`, sans capteur de période supplémentaire.
 
 Les identifiants sont **les mêmes chez tout le monde**, quelle que soit la langue de Home Assistant : les exemples ci-dessous marchent tels quels. Les libellés affichés, eux, sont traduits. Le capteur binaire existe aussi en option Base, où il reste éteint, pour qu'une automatisation écrite pour un contrat fonctionne avec les autres.
 
@@ -62,7 +64,18 @@ automation:
           temperature: 19
 ```
 
-Mise à jour depuis la 0.2 : les entités sont renommées automatiquement au premier démarrage. Pensez à corriger vos automatisations, qui référencent les anciens noms.
+### Mise à jour depuis la 0.2
+
+Jusqu'à la 0.2, l'identifiant était fabriqué à partir du nom de l'appareil et du libellé traduit : il changeait donc avec le contrat, la puissance et la langue de Home Assistant.
+
+| Avant (0.2) | Depuis la 1.0 |
+|---|---|
+| `sensor.tarif_bleu_tempo_9_kva_prix_actuel` | `sensor.prix_kwh_actuel` |
+| `sensor.tarif_bleu_tempo_9_kva_prix_jour_rouge_heures_pleines` | `sensor.prix_kwh_rouge_hp` |
+| `sensor.tarif_bleu_heures_creuses_6_kva_prix_heures_creuses` | `sensor.prix_kwh_hc` |
+| `binary_sensor.tarif_bleu_heures_creuses_6_kva_heures_creuses` | `binary_sensor.heures_creuses` |
+
+Les entités sont renommées au premier démarrage, **sans perdre l'historique**. Un identifiant déjà pris par autre chose est laissé tranquille : l'ancienne entité garde alors son nom. Les automatisations, scripts et cartes qui citent les anciens identifiants sont à corriger à la main — Home Assistant ne les suit pas.
 
 ### Installation
 
@@ -113,17 +126,21 @@ Les **offres de marché** des fournisseurs alternatifs (prix libres) ne sont pas
 
 For one pricing option and one subscribed power, the integration creates:
 
-| Entity | What | Example |
-|---|---|---|
-| `sensor.prix_kwh_actuel` | Price of the kWh incl. taxes, for the Energy dashboard | 0.1589 |
-| `binary_sensor.heures_creuses` | On during off-peak hours; `next_change` attribute holds the next switch | On, until 06:00 |
-| `sensor.periode_actuelle` | Period in force | `rouge_hp` |
-| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Price of each period, Heures Creuses option | 0.2142 · 0.1589 |
-| `sensor.prix_kwh_bleu_hc` … `sensor.prix_kwh_rouge_hp` | The six Tempo prices | 0.7295 |
-| `sensor.abonnement_mensuel` | Monthly subscription incl. taxes | €15.86 |
-| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo colour | Blue / White / Red |
-| `sensor.jours_bleus_restants` · `blancs` · `rouges` | Days left in the season | 281 / 43 / 22 |
-| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | Diagnostic | 2026-08-01, CRE |
+| Entity | Option | What | Example |
+|---|---|---|---|
+| `sensor.prix_kwh_actuel` | all | Price of the kWh incl. taxes, for the Energy dashboard | 0.1589 |
+| `binary_sensor.heures_creuses` | all | On during off-peak hours; `next_change` attribute holds the next switch | On, until 06:00 |
+| `sensor.periode_actuelle` | all | Period in force | `rouge_hp` |
+| `sensor.abonnement_mensuel` | all | Monthly subscription incl. taxes | €15.86 |
+| `sensor.prix_en_vigueur_depuis` · `sensor.source_des_prix` | all | Diagnostic | 2026-08-01, CRE |
+| `sensor.prix_kwh_hp` · `sensor.prix_kwh_hc` | Heures Creuses | Price of each period | 0.2142 · 0.1589 |
+| `sensor.prix_kwh_bleu_hc` · `sensor.prix_kwh_bleu_hp` · `sensor.prix_kwh_blanc_hc` · `sensor.prix_kwh_blanc_hp` · `sensor.prix_kwh_rouge_hc` · `sensor.prix_kwh_rouge_hp` | Tempo | The six Tempo prices | 0.7295 |
+| `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo | Tempo colour | Blue / White / Red |
+| `sensor.jours_bleus_restants` · `sensor.jours_blancs_restants` · `sensor.jours_rouges_restants` | Tempo | Days left in the season | 281 / 43 / 22 |
+
+The Base option has a single price: that is `sensor.prix_kwh_actuel`, with no extra per-period sensor.
+
+The ids are French on every install, on purpose: this integration only ever follows the French regulated tariff, so an example copied from this page or from a forum works as it is.
 
 Entity ids are **the same on every install**, whatever the language of Home Assistant, so the examples below work as they are; the labels shown in the interface are translated. The binary sensor is created for the Base option too, where it stays off, so an automation written for one contract works with the others.
 
@@ -132,6 +149,19 @@ The price changes on the minute: at your off-peak hours, and at 06:00 / 22:00 fo
 RTE publishes tomorrow's colour the day before around 11:00; until then the "Tempo colour tomorrow" sensor is unknown. RTE publishes nothing further ahead.
 
 Example: the day before a red day, heat at full power during off-peak hours, until 06:00: trigger on the *Off-peak hours* binary sensor turning on, with the condition *Tempo colour tomorrow* = `rouge`; set the temperature back when it turns off. The French section above has the full YAML.
+
+### Upgrading from 0.2
+
+Up to 0.2 the id was built from the device name and the translated label, so it changed with the contract, the power and the language of Home Assistant.
+
+| Before (0.2) | Since 1.0 |
+|---|---|
+| `sensor.tarif_bleu_tempo_9_kva_prix_actuel` | `sensor.prix_kwh_actuel` |
+| `sensor.tarif_bleu_tempo_9_kva_prix_jour_rouge_heures_pleines` | `sensor.prix_kwh_rouge_hp` |
+| `sensor.tarif_bleu_heures_creuses_6_kva_prix_heures_creuses` | `sensor.prix_kwh_hc` |
+| `binary_sensor.tarif_bleu_heures_creuses_6_kva_heures_creuses` | `binary_sensor.heures_creuses` |
+
+Entities are renamed on the first start, **keeping their history**. An id already taken by something else is left alone, and that entity keeps its old name. Automations, scripts and cards naming the old ids have to be updated by hand: Home Assistant does not follow them.
 
 ### Installation
 

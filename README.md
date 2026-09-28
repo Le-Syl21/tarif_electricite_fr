@@ -119,6 +119,12 @@ Les **offres de marché** des fournisseurs alternatifs (prix libres) ne sont pas
 
 [delphiki/hass-tarif-edf](https://github.com/delphiki/hass-tarif-edf) a longtemps rendu ce service. Elle prenait la dernière ligne du fichier plutôt que celle en vigueur, n'avait pas de source de secours, et n'est plus maintenue. Tarif électricité FR est écrite de zéro, sans reprendre son code.
 
+### 💬 Communauté & support
+
+Des questions, un bug à signaler ou juste envie d'en discuter ? Rejoignez le Discord, section *Home Assistant* :
+
+[![Discord](https://img.shields.io/badge/Discord-Le--Syl21%20Tools-5865F2?logo=discord&logoColor=white)](https://discord.gg/T37DYHmt2j)
+
 <a name="english"></a>
 ## <img src=".github/flags/gb.svg" height="14" alt="GB"> English
 
@@ -204,6 +210,12 @@ Their Tarif Bleu prices are **the same as EDF's**, since the government sets the
 ### Why a new integration
 
 [delphiki/hass-tarif-edf](https://github.com/delphiki/hass-tarif-edf) did this job for a long time. It took the last row of the file rather than the one in force, had no fallback source, and is no longer maintained. Tarif électricité FR is written from scratch and reuses none of its code.
+
+### 💬 Community & support
+
+Questions, bug reports, or just want to chat? Join the Discord, *Home Assistant* section:
+
+[![Discord](https://img.shields.io/badge/Discord-Le--Syl21%20Tools-5865F2?logo=discord&logoColor=white)](https://discord.gg/T37DYHmt2j)
 
 ## Development / Développement
 

@@ -8,8 +8,9 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 
-from .const import OBJECT_IDS
+from .const import CONF_ENERGY_FIXED_COST, OBJECT_IDS
 from .coordinator import TarifConfigEntry, TarifCoordinator
+from .energy import async_sync_fixed_cost
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,7 +46,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: TarifConfigEntry) -> boo
     entry.runtime_data = coordinator
     entry.async_on_unload(entry.add_update_listener(_async_reload))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    if entry.options.get(CONF_ENERGY_FIXED_COST):
+        _sync_fixed_cost(hass, entry)
+        entry.async_on_unload(coordinator.async_add_listener(lambda: _sync_fixed_cost(hass, entry)))
     return True
+
+
+@callback
+def _sync_fixed_cost(hass: HomeAssistant, entry: TarifConfigEntry) -> None:
+    """Copy the subscription into the energy dashboard (a no-op when it is already there)."""
+    tariff = entry.runtime_data.data.tariff if entry.runtime_data.data else None
+    if tariff is None:
+        return
+    entry.async_create_background_task(
+        hass,
+        async_sync_fixed_cost(hass, entry.entry_id, tariff.subscription_monthly),
+        f"{entry.entry_id} energy fixed cost",
+    )
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: TarifConfigEntry) -> bool:

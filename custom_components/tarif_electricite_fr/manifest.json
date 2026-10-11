@@ -1,6 +1,7 @@
 {
   "domain": "tarif_electricite_fr",
   "name": "Tarif électricité FR",
+  "after_dependencies": ["energy"],
   "codeowners": ["@Le-Syl21"],
   "config_flow": true,
   "documentation": "https://github.com/Le-Syl21/tarif_electricite_fr",
@@ -8,5 +9,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Le-Syl21/tarif_electricite_fr/issues",
   "requirements": ["pdfplumber==0.11.10"],
-  "version": "1.0.1"
+  "version": "1.1.0"
 }

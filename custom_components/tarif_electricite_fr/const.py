@@ -8,6 +8,7 @@ DOMAIN: Final = "tarif_electricite_fr"
 CONF_OPTION: Final = "option"
 CONF_POWER: Final = "power"
 CONF_OFFPEAK: Final = "offpeak_hours"
+CONF_ENERGY_FIXED_COST: Final = "energy_fixed_cost"
 
 OPTION_BASE: Final = "base"
 OPTION_HPHC: Final = "hphc"

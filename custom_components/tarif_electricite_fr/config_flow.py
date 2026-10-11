@@ -13,6 +13,7 @@ from homeassistant.config_entries import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -20,6 +21,7 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
+    CONF_ENERGY_FIXED_COST,
     CONF_OFFPEAK,
     CONF_OPTION,
     CONF_POWER,
@@ -106,20 +108,23 @@ class TarifConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class TarifOptionsFlow(OptionsFlow):
-    """Only HP/HC has something to change later: the off-peak hours."""
+    """The energy dashboard's fixed cost, and for HP/HC the off-peak hours."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        if self.config_entry.data[CONF_OPTION] != OPTION_HPHC:
-            return self.async_abort(reason="nothing_to_configure")
+        hphc = self.config_entry.data[CONF_OPTION] == OPTION_HPHC
         errors: dict[str, str] = {}
         if user_input is not None:
-            if error := _offpeak_error(user_input[CONF_OFFPEAK]):
+            if hphc and (error := _offpeak_error(user_input[CONF_OFFPEAK])):
                 errors[CONF_OFFPEAK] = error
             else:
                 return self.async_create_entry(data=user_input)
-        current = self.config_entry.options.get(CONF_OFFPEAK, DEFAULT_OFFPEAK)
-        return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema({vol.Required(CONF_OFFPEAK, default=current): TextSelector()}),
-            errors=errors,
-        )
+        options = self.config_entry.options
+        schema: dict[Any, Any] = {}
+        if hphc:
+            schema[
+                vol.Required(CONF_OFFPEAK, default=options.get(CONF_OFFPEAK, DEFAULT_OFFPEAK))
+            ] = TextSelector()
+        schema[
+            vol.Required(CONF_ENERGY_FIXED_COST, default=options.get(CONF_ENERGY_FIXED_COST, False))
+        ] = BooleanSelector()
+        return self.async_show_form(step_id="init", data_schema=vol.Schema(schema), errors=errors)

@@ -30,20 +30,19 @@
   "options": {
     "step": {
       "init": {
-        "title": "Off-peak hours",
+        "title": "Settings",
         "data": {
-          "offpeak_hours": "Off-peak hours"
+          "offpeak_hours": "Off-peak hours",
+          "energy_fixed_cost": "Keep the energy dashboard's fixed cost up to date"
         },
         "data_description": {
-          "offpeak_hours": "Off-peak hours as written on your bill or in your customer area, for example 22:00-06:00, 1h/7h30 & 13h/14h30, or HC (22H30-6H30)."
+          "offpeak_hours": "Off-peak hours as written on your bill or in your customer area, for example 22:00-06:00, 1h/7h30 & 13h/14h30, or HC (22H30-6H30).",
+          "energy_fixed_cost": "Writes the subscription, spread per day, into the fixed daily cost of the energy dashboard's grid connection that uses this price, and updates it whenever the regulated subscription changes."
         }
       }
     },
     "error": {
       "invalid_offpeak": "Write the hours as 22:00-06:00, several ranges separated by commas."
-    },
-    "abort": {
-      "nothing_to_configure": "Only the Heures Creuses option has settings (its off-peak hours)."
     }
   },
   "selector": {

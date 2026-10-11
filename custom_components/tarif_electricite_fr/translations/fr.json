@@ -30,20 +30,19 @@
   "options": {
     "step": {
       "init": {
-        "title": "Heures creuses",
+        "title": "Réglages",
         "data": {
-          "offpeak_hours": "Heures creuses"
+          "offpeak_hours": "Heures creuses",
+          "energy_fixed_cost": "Tenir à jour le coût fixe du tableau de bord Énergie"
         },
         "data_description": {
-          "offpeak_hours": "Les heures creuses telles qu'écrites sur votre facture ou votre espace client, par exemple 22:00-06:00, 1h/7h30 & 13h/14h30, ou HC (22H30-6H30)."
+          "offpeak_hours": "Les heures creuses telles qu'écrites sur votre facture ou votre espace client, par exemple 22:00-06:00, 1h/7h30 & 13h/14h30, ou HC (22H30-6H30).",
+          "energy_fixed_cost": "Reporte l'abonnement, ramené à la journée, dans le coût fixe quotidien du raccordement au réseau qui utilise ce prix dans le tableau de bord Énergie, et le met à jour à chaque changement du tarif réglementé."
         }
       }
     },
     "error": {
       "invalid_offpeak": "Écrivez les heures sous la forme 22:00-06:00, plusieurs plages séparées par des virgules."
-    },
-    "abort": {
-      "nothing_to_configure": "Seule l'option Heures Creuses a des réglages (ses heures creuses)."
     }
   },
   "selector": {

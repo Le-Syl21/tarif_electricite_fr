@@ -144,6 +144,18 @@
       },
       "remaining_rouge": {
         "name": "Jours rouges restants"
+      },
+      "cost_1h": {
+        "name": "Coût de la dernière heure"
+      },
+      "cost_24h": {
+        "name": "Coût des dernières 24 heures"
+      },
+      "cost_7d": {
+        "name": "Coût des 7 derniers jours"
+      },
+      "cost_30d": {
+        "name": "Coût des 30 derniers jours"
       }
     }
   }

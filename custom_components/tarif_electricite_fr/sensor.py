@@ -1,10 +1,10 @@
-"""Sensors: price now, period now, price of each period, subscription, Tempo colours."""
+"""Sensors: price now, period now, price of each period, subscription, Tempo colours, cost."""
 
 from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -13,14 +13,16 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
 )
 from homeassistant.const import CURRENCY_EURO, EntityCategory, UnitOfEnergy
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import tempo
-from .const import OBJECT_IDS, OPTION_TEMPO, PERIODS, TEMPO_COLOURS
+from .const import COST_REFRESH, COST_WINDOWS, OBJECT_IDS, OPTION_TEMPO, PERIODS, TEMPO_COLOURS
 from .coordinator import TarifConfigEntry, TarifCoordinator
+from .cost import async_cost_statistics, async_energy_cost, subscription_share
 from .entity import device_info
 from .periods import tempo_day
 
@@ -152,6 +154,9 @@ async def async_setup_entry(
     async_add_entities(
         TarifSensor(coordinator, description) for description in _descriptions(coordinator.option)
     )
+    async_add_entities(
+        TarifCostSensor(coordinator, key, window) for key, window in COST_WINDOWS.items()
+    )
 
 
 class TarifSensor(CoordinatorEntity[TarifCoordinator], SensorEntity):
@@ -176,3 +181,58 @@ class TarifSensor(CoordinatorEntity[TarifCoordinator], SensorEntity):
         if self.entity_description.attributes is None:
             return None
         return self.entity_description.attributes(self.coordinator)
+
+
+class TarifCostSensor(CoordinatorEntity[TarifCoordinator], SensorEntity):
+    """What the last `window` cost: the energy dashboard's cost, plus the subscription pro rata.
+
+    Unknown while no grid connection of the energy dashboard is priced by this
+    entry, or while the recorder has no cost statistics for the window yet.
+    """
+
+    _attr_has_entity_name = True
+    _attr_device_class = SensorDeviceClass.MONETARY
+    _attr_native_unit_of_measurement = CURRENCY_EURO
+    _attr_suggested_display_precision = 2
+
+    def __init__(self, coordinator: TarifCoordinator, key: str, window: timedelta) -> None:
+        super().__init__(coordinator)
+        entry = coordinator.config_entry
+        self._window = window
+        self._attr_translation_key = key
+        self._attr_unique_id = f"{entry.unique_id}_{key}"
+        self.entity_id = f"sensor.{OBJECT_IDS[key]}"
+        self._attr_device_info = device_info(coordinator)
+        self._attr_native_value = None
+        self._attr_extra_state_attributes = {}
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.async_on_remove(
+            async_track_time_interval(self.hass, self._async_refresh, COST_REFRESH)
+        )
+        await self._async_refresh()
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        # A new subscription changes the pro rata part: recompute.
+        self.hass.async_create_task(self._async_refresh())
+
+    async def _async_refresh(self, _now: datetime | None = None) -> None:
+        tariff = self.coordinator.data.tariff if self.coordinator.data else None
+        statistics = await async_cost_statistics(self.hass, self.coordinator.config_entry.entry_id)
+        end = dt_util.utcnow()
+        start = end - self._window
+        energy = await async_energy_cost(self.hass, statistics, start, end) if statistics else None
+        if tariff is None or energy is None:
+            self._attr_native_value = None
+            self._attr_extra_state_attributes = {}
+        else:
+            subscription = subscription_share(tariff.subscription_monthly, self._window)
+            self._attr_native_value = round(energy + subscription, 2)
+            self._attr_extra_state_attributes = {
+                "energy_cost": round(energy, 2),
+                "subscription_share": round(subscription, 2),
+                "since": dt_util.as_local(start).isoformat(timespec="minutes"),
+            }
+        self.async_write_ha_state()

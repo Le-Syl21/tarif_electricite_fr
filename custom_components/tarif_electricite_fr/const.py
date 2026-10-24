@@ -61,6 +61,15 @@ USER_AGENT: Final = "Mozilla/5.0 (X11; Linux x86_64) Home Assistant tarif_electr
 
 STORAGE_VERSION: Final = 1
 
+# Sliding windows of the cost sensors, and how often they are recomputed.
+COST_WINDOWS: Final = {
+    "cost_1h": timedelta(hours=1),
+    "cost_24h": timedelta(days=1),
+    "cost_7d": timedelta(days=7),
+    "cost_30d": timedelta(days=30),
+}
+COST_REFRESH: Final = timedelta(minutes=5)
+
 # Entity ids are fixed, and in French, whatever the language of Home Assistant:
 # this integration only ever serves the French regulated tariff, so an example
 # copied from the documentation or a forum works as it is on every install.
@@ -81,4 +90,8 @@ OBJECT_IDS: Final = {
         for slot in ("hc", "hp")
     },
     **{f"remaining_{c}": f"jours_{c}s_restants" for c in TEMPO_COLOURS},
+    "cost_1h": "cout_derniere_heure",
+    "cost_24h": "cout_24_heures",
+    "cost_7d": "cout_7_jours",
+    "cost_30d": "cout_30_jours",
 }

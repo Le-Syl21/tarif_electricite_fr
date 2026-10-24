@@ -1,7 +1,7 @@
 {
   "domain": "tarif_electricite_fr",
   "name": "Tarif électricité FR",
-  "after_dependencies": ["energy"],
+  "after_dependencies": ["energy", "recorder"],
   "codeowners": ["@Le-Syl21"],
   "config_flow": true,
   "documentation": "https://github.com/Le-Syl21/tarif_electricite_fr",

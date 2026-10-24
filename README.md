@@ -23,8 +23,11 @@ Pour une option et une puissance souscrite, l'intégration crée :
 | `sensor.prix_kwh_bleu_hc` · `sensor.prix_kwh_bleu_hp` · `sensor.prix_kwh_blanc_hc` · `sensor.prix_kwh_blanc_hp` · `sensor.prix_kwh_rouge_hc` · `sensor.prix_kwh_rouge_hp` | Tempo | Les six prix Tempo | 0,7295 |
 | `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo | Couleur Tempo | Bleu / Blanc / Rouge |
 | `sensor.jours_bleus_restants` · `sensor.jours_blancs_restants` · `sensor.jours_rouges_restants` | Tempo | Jours restants dans la saison | 281 / 43 / 22 |
+| `sensor.cout_derniere_heure` · `sensor.cout_24_heures` · `sensor.cout_7_jours` · `sensor.cout_30_jours` | toutes | Ce qu'a coûté l'électricité sur la dernière heure, les dernières 24 h, 7 et 30 jours glissants, abonnement compris (voir plus bas) | 3,42 € |
 
 En option Base il n'y a qu'un prix : c'est `sensor.prix_kwh_actuel`, sans capteur de période supplémentaire.
+
+Les quatre capteurs de coût reprennent le coût que le tableau de bord Énergie calcule pour votre raccordement au réseau, à condition que son prix soit `sensor.prix_kwh_actuel`, et y ajoutent la part d'abonnement de la période (mensuel × 12 / 365 par jour). Ils sont recalculés toutes les 5 minutes, à partir des statistiques que le recorder garde sans limite de durée : la fenêtre de 30 jours marche même si l'historique n'est gardé que 10 jours. Sans tableau de bord Énergie configuré, ils restent inconnus. Les attributs `energy_cost` et `subscription_share` donnent les deux parts séparément.
 
 Les identifiants sont **les mêmes chez tout le monde**, quelle que soit la langue de Home Assistant : les exemples ci-dessous marchent tels quels. Les libellés affichés, eux, sont traduits. Le capteur binaire existe aussi en option Base, où il reste éteint, pour qu'une automatisation écrite pour un contrat fonctionne avec les autres.
 
@@ -144,8 +147,11 @@ For one pricing option and one subscribed power, the integration creates:
 | `sensor.prix_kwh_bleu_hc` · `sensor.prix_kwh_bleu_hp` · `sensor.prix_kwh_blanc_hc` · `sensor.prix_kwh_blanc_hp` · `sensor.prix_kwh_rouge_hc` · `sensor.prix_kwh_rouge_hp` | Tempo | The six Tempo prices | 0.7295 |
 | `sensor.couleur_du_jour` · `sensor.couleur_de_demain` | Tempo | Tempo colour | Blue / White / Red |
 | `sensor.jours_bleus_restants` · `sensor.jours_blancs_restants` · `sensor.jours_rouges_restants` | Tempo | Days left in the season | 281 / 43 / 22 |
+| `sensor.cout_derniere_heure` · `sensor.cout_24_heures` · `sensor.cout_7_jours` · `sensor.cout_30_jours` | all | What electricity cost over the last hour, 24 hours, 7 and 30 sliding days, subscription included (see below) | €3.42 |
 
 The Base option has a single price: that is `sensor.prix_kwh_actuel`, with no extra per-period sensor.
+
+The four cost sensors take the cost the energy dashboard computes for your grid connection, as long as its price is `sensor.prix_kwh_actuel`, and add the subscription's share of the window (monthly × 12 / 365 per day). They are recomputed every 5 minutes from the statistics the recorder keeps with no time limit, so the 30-day window works even if the history is only kept 10 days. Without an energy dashboard set up, they stay unknown. The `energy_cost` and `subscription_share` attributes give both parts separately.
 
 The ids are French on every install, on purpose: this integration only ever follows the French regulated tariff, so an example copied from this page or from a forum works as it is.
 

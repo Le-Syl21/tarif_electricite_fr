@@ -144,6 +144,18 @@
       },
       "remaining_rouge": {
         "name": "Red days left"
+      },
+      "cost_1h": {
+        "name": "Cost, last hour"
+      },
+      "cost_24h": {
+        "name": "Cost, last 24 hours"
+      },
+      "cost_7d": {
+        "name": "Cost, last 7 days"
+      },
+      "cost_30d": {
+        "name": "Cost, last 30 days"
       }
     }
   }

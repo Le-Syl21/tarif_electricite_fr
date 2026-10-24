@@ -79,8 +79,8 @@ Les entités sont renommées au premier démarrage, **sans perdre l'historique**
 
 ### Installation
 
-1. HACS → *Dépôts personnalisés* → `https://github.com/Le-Syl21/tarif_electricite_fr`, catégorie *Intégration*.
-2. Installez *Tarif électricité FR*, redémarrez Home Assistant.
+1. Dans HACS, cherchez *Tarif électricité FR* ([ou ouvrez-la directement dans votre HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Le-Syl21&repository=tarif_electricite_fr&category=integration)).
+2. Installez-la, redémarrez Home Assistant.
 3. *Paramètres* → *Appareils et services* → *Ajouter une intégration* → *Tarif électricité FR*.
 4. Choisissez l'option, puis la puissance (en kVA, sur votre facture). Pour Heures Creuses, recopiez vos heures creuses telles qu'écrites sur la facture : `22:00-06:00`, `1h/7h30 & 13h/14h30` ou `HC (22H30-6H30)` sont acceptés. Elles se modifient ensuite dans *Configurer*.
 5. Facultatif : dans *Configurer*, cochez *Tenir à jour le coût fixe du tableau de bord Énergie*. Le tableau de bord n'accepte qu'un nombre pour le coût fixe par jour, pas une entité : l'intégration y reporte alors l'abonnement ramené à la journée (mensuel × 12 / 365) et le corrige à chaque changement de tarif. Seul le raccordement au réseau dont le prix est `sensor.prix_kwh_actuel` est modifié.
@@ -172,8 +172,8 @@ Entities are renamed on the first start, **keeping their history**. An id alread
 
 ### Installation
 
-1. HACS → *Custom repositories* → `https://github.com/Le-Syl21/tarif_electricite_fr`, category *Integration*.
-2. Install *Tarif électricité FR*, restart Home Assistant.
+1. In HACS, search for *Tarif électricité FR* ([or open it straight in your HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Le-Syl21&repository=tarif_electricite_fr&category=integration)).
+2. Install it, restart Home Assistant.
 3. *Settings* → *Devices & services* → *Add integration* → *Tarif électricité FR*.
 4. Pick the option, then the power (in kVA, on your bill). For Heures Creuses, copy your off-peak hours as written on your bill: `22:00-06:00`, `1h/7h30 & 13h/14h30` or `HC (22H30-6H30)` are accepted. They can be changed later under *Configure*.
 5. Optional: under *Configure*, tick *Keep the energy dashboard's fixed cost up to date*. The dashboard only takes a number for the fixed cost per day, not an entity: the integration then writes the subscription spread per day (monthly × 12 / 365) and corrects it whenever the tariff changes. Only the grid connection priced by `sensor.prix_kwh_actuel` is changed.

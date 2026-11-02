@@ -1,7 +1,9 @@
 name: Validate
 
-# Built and tested locally; CI only guards what gets tagged.
+# Built and tested locally; CI guards what gets tagged and the pull
+# requests (Dependabot's) before they are merged.
 on:
+  pull_request:
   push:
     tags: ["v*"]
   workflow_dispatch:

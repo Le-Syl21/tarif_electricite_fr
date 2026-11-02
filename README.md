@@ -5,6 +5,9 @@
 A Home Assistant integration for the French regulated electricity prices (EDF "Tarif Bleu": Base, Heures Creuses, Tempo), with the Tempo day colours.
 Une intégration Home Assistant pour les tarifs réglementés de l'électricité (« Tarif Bleu » d'EDF : Base, Heures Creuses, Tempo), avec les couleurs Tempo.
 
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://hacs.xyz/)
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Le-Syl21&repository=tarif_electricite_fr&category=integration)
+
 <a name="français"></a>
 ## <img src=".github/flags/fr.svg" height="14" alt="FR"> Français
 

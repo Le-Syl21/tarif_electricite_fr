@@ -286,47 +286,46 @@ def energy(hass: HomeAssistant):
         yield manager
 
 
-async def test_energy_fixed_cost_follows_subscription(
+async def test_old_fixed_cost_option_is_cleaned_up(
     hass: HomeAssistant, network, energy, freezer: FrozenDateTimeFactory
 ) -> None:
+    """1.2 wrote cost_adjustment_day, which Home Assistant never read: 1.3 takes it back."""
     freezer.move_to(datetime(2026, 9, 19, 12, tzinfo=PARIS))
+    await _setup(hass, {"option": "base", "power": 18})
+    entry = hass.config_entries.async_entries(DOMAIN)[0]
     energy.data["energy_sources"] = [
-        _grid("sensor.prix_kwh_actuel"),
+        _grid("sensor.prix_kwh_actuel", 0.7),
         _grid("sensor.someone_elses_price", 0.5),
     ]
-    await _setup(hass, {"option": "base", "power": 18}, {"energy_fixed_cost": True})
-    assert hass.states.get("sensor.abonnement_mensuel").state == "31.14"
+    # as left by 1.2; the update listener reloads the entry, which runs the clean-up
+    hass.config_entries.async_update_entry(entry, options={"energy_fixed_cost": True})
+    await hass.async_block_till_done()
     ours, other = energy.data["energy_sources"]
-    assert ours["cost_adjustment_day"] == round(31.14 * 12 / 365, 4)
+    assert "cost_adjustment_day" not in ours
     assert other["cost_adjustment_day"] == 0.5
+    assert entry.options == {}
 
 
-async def test_energy_fixed_cost_left_alone_when_off(
+async def test_old_fixed_cost_option_off_leaves_the_dashboard_alone(
     hass: HomeAssistant, network, energy, freezer: FrozenDateTimeFactory
 ) -> None:
     freezer.move_to(datetime(2026, 9, 19, 12, tzinfo=PARIS))
     energy.data["energy_sources"] = [_grid("sensor.prix_kwh_actuel", 0.7)]
-    await _setup(hass, {"option": "base", "power": 18})
+    entry = await _setup(hass, {"option": "base", "power": 18}, {"energy_fixed_cost": False})
     assert energy.data["energy_sources"][0]["cost_adjustment_day"] == 0.7
+    assert entry.options == {}
 
 
-async def test_options_flow_tempo_offers_fixed_cost(hass: HomeAssistant, network) -> None:
+async def test_options_flow_only_for_hphc(hass: HomeAssistant, network) -> None:
     entry = await _setup(hass, {"option": "tempo", "power": 9})
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    assert result["type"] is FlowResultType.FORM
-    assert list(result["data_schema"].schema) == ["energy_fixed_cost"]
-    result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"energy_fixed_cost": True}
-    )
-    assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert entry.options == {"energy_fixed_cost": True}
+    assert entry.supports_options is False
 
 
 async def test_options_flow_hphc_checks_offpeak(hass: HomeAssistant, network) -> None:
     entry = await _setup(hass, {"option": "hphc", "power": 6}, {"offpeak_hours": "22:00-06:00"})
     result = await hass.config_entries.options.async_init(entry.entry_id)
     result = await hass.config_entries.options.async_configure(
-        result["flow_id"], {"offpeak_hours": "nope", "energy_fixed_cost": False}
+        result["flow_id"], {"offpeak_hours": "nope"}
     )
     assert result["errors"] == {"offpeak_hours": "invalid_offpeak"}
 

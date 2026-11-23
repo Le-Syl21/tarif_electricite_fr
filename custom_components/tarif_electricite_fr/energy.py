@@ -1,9 +1,10 @@
-"""Keep the energy dashboard's fixed daily cost equal to the subscription.
+"""Undo the old energy dashboard "fixed cost" option.
 
-The dashboard takes the fixed cost as a plain number (cost_adjustment_day), not an
-entity, so it goes stale when the regulated subscription changes. When the user
-turns this on, every grid connection whose import price is one of this entry's
-sensors gets the subscription spread over the days of the year.
+Up to 1.2 an option wrote the subscription into the grid connections'
+cost_adjustment_day. Home Assistant never read that field (it is removed in
+2026.12, home-assistant/core#192275), so the option did nothing. On start, an
+entry that had it turned on takes the value back out of the grid connections
+priced by its sensors, then forgets the option.
 """
 
 from __future__ import annotations
@@ -21,8 +22,8 @@ def daily_cost(subscription_monthly: float) -> float:
     return round(subscription_monthly * 12 / 365, 4)
 
 
-async def async_sync_fixed_cost(hass: HomeAssistant, entry_id: str, monthly: float) -> bool:
-    """Write the daily subscription to the grid sources priced by this entry.
+async def async_remove_fixed_cost(hass: HomeAssistant, entry_id: str) -> bool:
+    """Drop cost_adjustment_day from the grid sources priced by this entry.
 
     Returns True when the energy preferences were changed.
     """
@@ -37,22 +38,19 @@ async def async_sync_fixed_cost(hass: HomeAssistant, entry_id: str, monthly: flo
         entity.entity_id
         for entity in er.async_entries_for_config_entry(er.async_get(hass), entry_id)
     }
-    wanted = daily_cost(monthly)
     sources = []
     changed = False
     for source in manager.data["energy_sources"]:
         if (
             source["type"] == "grid"
             and source.get("entity_energy_price") in ours
-            and source.get("cost_adjustment_day") != wanted
+            and "cost_adjustment_day" in source
         ):
             _LOGGER.info(
-                "Energy dashboard: fixed cost per day %s -> %s EUR (subscription %s EUR/month)",
-                source.get("cost_adjustment_day"),
-                wanted,
-                monthly,
+                "Energy dashboard: removing the unused fixed cost %s written by 1.2",
+                source["cost_adjustment_day"],
             )
-            source = {**source, "cost_adjustment_day": wanted}
+            source = {k: v for k, v in source.items() if k != "cost_adjustment_day"}
             changed = True
         sources.append(source)
     if changed:

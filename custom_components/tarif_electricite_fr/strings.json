@@ -32,12 +32,10 @@
       "init": {
         "title": "Settings",
         "data": {
-          "offpeak_hours": "Off-peak hours",
-          "energy_fixed_cost": "Keep the energy dashboard's fixed cost up to date"
+          "offpeak_hours": "Off-peak hours"
         },
         "data_description": {
-          "offpeak_hours": "Off-peak hours as written on your bill or in your customer area, for example 22:00-06:00, 1h/7h30 & 13h/14h30, or HC (22H30-6H30).",
-          "energy_fixed_cost": "Writes the subscription, spread per day, into the fixed daily cost of the energy dashboard's grid connection that uses this price, and updates it whenever the regulated subscription changes."
+          "offpeak_hours": "Off-peak hours as written on your bill or in your customer area, for example 22:00-06:00, 1h/7h30 & 13h/14h30, or HC (22H30-6H30)."
         }
       }
     },

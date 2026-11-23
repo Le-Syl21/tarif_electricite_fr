@@ -8,6 +8,7 @@ DOMAIN: Final = "tarif_electricite_fr"
 CONF_OPTION: Final = "option"
 CONF_POWER: Final = "power"
 CONF_OFFPEAK: Final = "offpeak_hours"
+# Option of 1.2, removed in 1.3: only read to clean up after it
 CONF_ENERGY_FIXED_COST: Final = "energy_fixed_cost"
 
 OPTION_BASE: Final = "base"

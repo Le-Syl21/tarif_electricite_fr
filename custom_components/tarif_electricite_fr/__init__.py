@@ -10,7 +10,7 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import CONF_ENERGY_FIXED_COST, OBJECT_IDS
 from .coordinator import TarifConfigEntry, TarifCoordinator
-from .energy import async_sync_fixed_cost
+from .energy import async_remove_fixed_cost
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,29 +40,24 @@ def _rename_old_entities(hass: HomeAssistant, entry: TarifConfigEntry) -> None:
 
 async def async_setup_entry(hass: HomeAssistant, entry: TarifConfigEntry) -> bool:
     _rename_old_entities(hass, entry)
+    if CONF_ENERGY_FIXED_COST in entry.options:
+        # before the update listener exists, so changing the options does not reload
+        await _drop_fixed_cost_option(hass, entry)
     coordinator = TarifCoordinator(hass, entry)
     await coordinator.async_load()
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
     entry.async_on_unload(entry.add_update_listener(_async_reload))
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    if entry.options.get(CONF_ENERGY_FIXED_COST):
-        _sync_fixed_cost(hass, entry)
-        entry.async_on_unload(coordinator.async_add_listener(lambda: _sync_fixed_cost(hass, entry)))
     return True
 
 
-@callback
-def _sync_fixed_cost(hass: HomeAssistant, entry: TarifConfigEntry) -> None:
-    """Copy the subscription into the energy dashboard (a no-op when it is already there)."""
-    tariff = entry.runtime_data.data.tariff if entry.runtime_data.data else None
-    if tariff is None:
-        return
-    entry.async_create_background_task(
-        hass,
-        async_sync_fixed_cost(hass, entry.entry_id, tariff.subscription_monthly),
-        f"{entry.entry_id} energy fixed cost",
-    )
+async def _drop_fixed_cost_option(hass: HomeAssistant, entry: TarifConfigEntry) -> None:
+    """Forget the 1.2 fixed cost option, taking back what it wrote when it was on."""
+    if entry.options[CONF_ENERGY_FIXED_COST]:
+        await async_remove_fixed_cost(hass, entry.entry_id)
+    options = {k: v for k, v in entry.options.items() if k != CONF_ENERGY_FIXED_COST}
+    hass.config_entries.async_update_entry(entry, options=options)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: TarifConfigEntry) -> bool:

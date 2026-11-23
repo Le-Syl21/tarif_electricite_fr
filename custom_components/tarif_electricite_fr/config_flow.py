@@ -13,7 +13,6 @@ from homeassistant.config_entries import (
 )
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
-    BooleanSelector,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -21,7 +20,6 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    CONF_ENERGY_FIXED_COST,
     CONF_OFFPEAK,
     CONF_OPTION,
     CONF_POWER,
@@ -106,25 +104,25 @@ class TarifConfigFlow(ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         return TarifOptionsFlow()
 
+    @classmethod
+    @callback
+    def async_supports_options_flow(cls, config_entry: ConfigEntry) -> bool:
+        # the only setting left is the off-peak hours
+        return config_entry.data[CONF_OPTION] == OPTION_HPHC
+
 
 class TarifOptionsFlow(OptionsFlow):
-    """The energy dashboard's fixed cost, and for HP/HC the off-peak hours."""
+    """The off-peak hours of an HP/HC contract."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        hphc = self.config_entry.data[CONF_OPTION] == OPTION_HPHC
         errors: dict[str, str] = {}
         if user_input is not None:
-            if hphc and (error := _offpeak_error(user_input[CONF_OFFPEAK])):
+            if error := _offpeak_error(user_input[CONF_OFFPEAK]):
                 errors[CONF_OFFPEAK] = error
             else:
                 return self.async_create_entry(data=user_input)
         options = self.config_entry.options
-        schema: dict[Any, Any] = {}
-        if hphc:
-            schema[
-                vol.Required(CONF_OFFPEAK, default=options.get(CONF_OFFPEAK, DEFAULT_OFFPEAK))
-            ] = TextSelector()
-        schema[
-            vol.Required(CONF_ENERGY_FIXED_COST, default=options.get(CONF_ENERGY_FIXED_COST, False))
-        ] = BooleanSelector()
+        schema = {
+            vol.Required(CONF_OFFPEAK, default=options.get(CONF_OFFPEAK, DEFAULT_OFFPEAK)): TextSelector()
+        }
         return self.async_show_form(step_id="init", data_schema=vol.Schema(schema), errors=errors)
